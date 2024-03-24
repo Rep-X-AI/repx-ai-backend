@@ -3,5 +3,6 @@
 ### .env file contents:
 
 ```
-MONGO_URL="mongodb+srv://satyakidey75:QokvCYLo58hW6cBh@db.pujrpgl.mongodb.net/?retryWrites=true&w=majority&appName=db"
+REACT_APP_NODE_ENV=development
+MONGO_URI=mongodb+srv://repxadmin:123Subha@cluster0.fiexybq.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
 ```
