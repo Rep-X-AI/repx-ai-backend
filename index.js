@@ -24,7 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 // Define Routes
 app.use("/api/users", require("./routes/createUser"));
 app.use("/api/assignments", require("./routes/createAssignment"));
-
+app.use("/api/users", require("./routes/getUser"));
 
 
 const PORT = process.env.PORT || 5000;

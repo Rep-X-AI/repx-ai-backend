@@ -3,9 +3,9 @@ const router = express.Router();
 const { User } = require("../model/User");
 
 router.post("/adduser", async (req, res) => {
-  const {email, name, role} = req.body;
+  const { useruid, email, name, role } = req.body;
   try {
-    const user = new User({email, name, role});
+    const user = new User({ useruid, email, name, role });
     await user.save();
     res.send(user);
   } catch (error) {
