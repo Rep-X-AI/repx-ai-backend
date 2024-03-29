@@ -1,14 +1,20 @@
 const express = require("express");
-const connectDB = require("./config/db");
-const cors = require("cors"); // to allow cross-origin requests
+const cors = require("cors");
+const server = express();
+const mongoose = require('mongoose');
+require('dotenv').config();
 
-const app = express();
+
+const usersRouter = require('./routes/User');
+const assignmentsRouter = require('./routes/Assignment');
+
+
 const corsOrigin =
   process.env.REACT_APP_NODE_ENV === "production"
     ? "https://repxai-dummy.vercel.app"
     : "http://localhost:3000";
 
-app.use(
+server.use(
   cors({
     origin: corsOrigin,
     methods: "GET,HEAD,PUT,PATCH,POST,OPTIONS,DELETE",
@@ -17,15 +23,28 @@ app.use(
 );
 
 // Connect to database
-connectDB();
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+connectToDB().catch(err => console.log(err));
+async function connectToDB(){
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("Database Connected!");
+}
+
+server.use(express.json());
+server.use(express.urlencoded({ extended: true }));
 
 // Define Routes
-app.use("/api/users", require("./routes/createUser"));
-app.use("/api/assignments", require("./routes/createAssignment"));
-app.use("/api/users", require("./routes/getUser"));
+server.use("/api/users", usersRouter.router);
+server.use("/api/assignments", assignmentsRouter.router);
 
 
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.get('/', (req, res) => {
+  res.json({status: "success"});
+})
+
+
+const PORT = process.env.PORT || 8080;
+server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+
+
+
