@@ -38,7 +38,7 @@ server.use("/api/assignments", assignmentsRouter.router);
 
 
 server.get('/', (req, res) => {
-  res.json({status: "success"});
+  res.json({status: "You will find nothing here xD"});
 })
 
 
