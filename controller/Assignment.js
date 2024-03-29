@@ -10,3 +10,38 @@ exports.createAssignment = async (req, res) => {
     }
 }
 
+exports.fetchAssignmentsOfTeacher = async (req, res) => {
+    const { useruid } = req.params;
+    try {
+        const assignments = await Assignment.aggregate([
+            { $match: { createdBy: useruid } },
+            { $lookup: { from: 'users', localField: 'students', foreignField: 'useruid', as: 'students' } }
+        ]);
+        res.status(200).json({ assignments });
+    } catch (err) {
+        res.status(400).json(err);
+    }
+};
+
+exports.fetchAssignmentsOfStudent = async (req, res) => {
+    const { useruid } = req.params;
+    try {
+        const assignments = await Assignment.aggregate([
+            { $match: { students: useruid } },
+            { $lookup: { from: 'users', localField: 'createdBy', foreignField: 'useruid', as: 'teacher' } }
+        ]);
+        res.status(200).json({ assignments });
+    } catch (err) {
+        res.status(400).json(err);
+    }
+};
+
+exports.updateAssignment = async (req, res) => {
+    const { id } = req.params;
+    try {
+      const assignment = await Assignment.findByIdAndUpdate(id, req.body, { new: true });
+      res.status(200).json(assignment);
+    } catch (err) {
+      res.status(400).json(err);
+    }
+  };
