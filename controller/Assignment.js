@@ -28,7 +28,10 @@ exports.fetchAssignmentsOfStudent = async (req, res) => {
     try {
         const assignments = await Assignment.aggregate([
             { $match: { students: useruid } },
-            { $lookup: { from: 'users', localField: 'createdBy', foreignField: 'useruid', as: 'teacher' } }
+            { $lookup: { from: 'users', localField: 'createdBy', foreignField: 'useruid', as: 'teacher' } },
+            { $unwind: '$teacher' },
+            { $project: { title: 1,  desc: 1, questionUrl: 1, teacher: '$teacher.name' } }
+
         ]);
         res.status(200).json({ assignments });
     } catch (err) {
