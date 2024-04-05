@@ -1,14 +1,24 @@
 const { Assignment } = require("../model/Assignment");
 
 exports.createAssignment = async (req, res) => {
-    const assignment = new Assignment(req.body);
+    const { title, desc, createdBy, students, submissions ,questionUrl,modelAnsUrl} = req.body;
     try {
+        const assignment = new Assignment({
+            title: title,
+            desc: desc,
+            questionUrl: questionUrl,
+            modelAnsUrl: modelAnsUrl, 
+            createdBy: createdBy,
+            students: students,
+            submissions: submissions,
+        });
         const doc = await assignment.save();
         res.status(201).json(doc);
     } catch (err) {
         res.status(400).send(err);
     }
-}
+};
+
 
 exports.fetchAssignmentsOfTeacher = async (req, res) => {
     const { useruid } = req.params;

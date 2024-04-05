@@ -4,6 +4,7 @@ const server = express();
 const mongoose = require('mongoose');
 require('dotenv').config();
 
+server.use("/Assignments" , express.static("Assignments"))
 
 const usersRouter = require('./routes/User');
 const assignmentsRouter = require('./routes/Assignment');
