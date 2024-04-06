@@ -1,24 +1,29 @@
 const { Assignment } = require("../model/Assignment");
 
+async function generateUniqueCode(length) {
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    const charactersLength = characters.length;
+    let result = '';
+    for (let i = 0; i < length; i++) {
+      result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    const existingAssignment = await Assignment.findOne({ code: result }).exec();
+    if (existingAssignment) {
+      return generateUniqueCode(length);
+    }
+    return result;
+  }
+
 exports.createAssignment = async (req, res) => {
-    const { title, desc, createdBy, students, submissions ,questionUrl,modelAnsUrl} = req.body;
+    const code = await generateUniqueCode(10);
+    const assignment = new Assignment({ ...req.body, code: code });
     try {
-        const assignment = new Assignment({
-            title: title,
-            desc: desc,
-            questionUrl: questionUrl,
-            modelAnsUrl: modelAnsUrl, 
-            createdBy: createdBy,
-            students: students,
-            submissions: submissions,
-        });
         const doc = await assignment.save();
         res.status(201).json(doc);
     } catch (err) {
         res.status(400).send(err);
     }
-};
-
+}
 
 exports.fetchAssignmentsOfTeacher = async (req, res) => {
     const { useruid } = req.params;
@@ -50,19 +55,22 @@ exports.fetchAssignmentsOfStudent = async (req, res) => {
 };
 
 exports.deleteAssignment = async (req, res) => {
-    const { id } = req.params;
+    const code = req.params.id;
     try {
-        const assignment = await Assignment.findByIdAndDelete(id);
-        res.status(200).json({ "assignment": assignment, "status": "deleted" });
+        const assignment = await Assignment.findOneAndDelete({ code });
+        if (!assignment) {
+            return res.status(404).json({ error: "Assignment not found" });
+        }
+        res.status(200).json({ message: "Assignment deleted successfully" });
     } catch (err) {
         res.status(400).json(err);
     }
 };
 
 exports.updateAssignment = async (req, res) => {
-    const { id } = req.params;
+    const code = req.params.id;
     try {
-        const assignment = await Assignment.findByIdAndUpdate(id, req.body, { new: true });
+        const assignment = await Assignment.findOneAndUpdate({ code }, req.body, { new: true });
         res.status(200).json({ "assignment": assignment, "status": "updated" });
     } catch (err) {
         res.status(400).json(err);
@@ -70,9 +78,9 @@ exports.updateAssignment = async (req, res) => {
 };
 
 exports.deleteAllSubmissions = async (req, res) => {
-    const { id } = req.params;
+    const code = req.params.id;
     try {
-        const result = await Assignment.updateOne({ _id: id }, { $set: { submissions: [] } });
+        const result = await Assignment.updateOne({ code }, { $set: { submissions: [] } });
         if (result.modifiedCount > 0) {
             return res.status(200).json({ message: 'Submissions deleted successfully' });
         } else {
@@ -82,3 +90,21 @@ exports.deleteAllSubmissions = async (req, res) => {
         res.status(400).json(err);
     }
 };
+
+exports.joinAssignment = async (req,res) =>{
+    const { code, uid } = req.body;
+    try {
+        const assignment = await Assignment.findOne({ code });
+        if (!assignment) {
+            return res.status(404).json({ error: 'Assignment not found' });
+        }
+        if (assignment.students.includes(uid)) {
+            return res.status(409).json({ error: 'Student is already part of this assignment' });
+        }
+        assignment.students.push(uid);
+        await assignment.save();
+        res.status(200).json({ message: 'Student added to assignment successfully' });
+    } catch (error) {
+        res.status(400).send(error);
+    }
+}
