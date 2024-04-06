@@ -30,7 +30,42 @@ exports.fetchAssignmentsOfTeacher = async (req, res) => {
     try {
         const assignments = await Assignment.aggregate([
             { $match: { createdBy: useruid } },
-            { $lookup: { from: 'users', localField: 'students', foreignField: 'useruid', as: 'students' } }
+            { $lookup: { from: 'users', localField: 'students', foreignField: 'useruid', as: 'students' } },
+            { $addFields: { 
+                    students: { 
+                        $map: { 
+                            input: '$students', 
+                            as: 'student', 
+                            in: { 
+                                name: '$$student.name', 
+                                email: '$$student.email' 
+                            } 
+                        } 
+                    },
+                    submissions: { 
+                        $map: { 
+                            input: '$submissions', 
+                            as: 'submission', 
+                            in: { 
+                                name: { 
+                                    $arrayElemAt: [ 
+                                        '$students.name', 
+                                        { $indexOfArray: ['$students.useruid', '$$submission.student'] }
+                                    ] 
+                                },
+                                answerUrl: '$$submission.answerUrl', 
+                                marks: {
+                                    $cond: {
+                                        if: { $eq: ['$isEvaluated', true] },
+                                        then: '$$submission.marks',
+                                        else: null
+                                    }
+                                }
+                            } 
+                        } 
+                    }
+                } 
+            }
         ]);
         res.status(200).json({ assignments });
     } catch (err) {
@@ -45,8 +80,32 @@ exports.fetchAssignmentsOfStudent = async (req, res) => {
             { $match: { students: useruid } },
             { $lookup: { from: 'users', localField: 'createdBy', foreignField: 'useruid', as: 'teacher' } },
             { $unwind: '$teacher' },
-            { $project: { title: 1,  desc: 1, code: 1, questionUrl: 1, teacher: '$teacher.name' } }
-
+            {
+                $project: { title: 1, desc: 1, code: 1, isPublished: 1, questionUrl: 1, teacher: '$teacher.name',
+                    submissions: {
+                        $map: {
+                            input: {
+                                $filter: {
+                                    input: '$submissions',
+                                    as: 'submission',
+                                    cond: { $eq: ['$$submission.student', useruid] }
+                                }
+                            },
+                            as: 'submission',
+                            in: {
+                                answerUrl: '$$submission.answerUrl',
+                                marks: {
+                                    $cond: {
+                                        if: { $eq: ['$isPublished', true] },
+                                        then: '$$submission.marks',
+                                        else: null
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
         ]);
         res.status(200).json({ assignments });
     } catch (err) {
