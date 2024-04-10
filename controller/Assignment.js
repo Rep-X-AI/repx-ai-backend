@@ -73,6 +73,7 @@ exports.fetchAssignmentsOfTeacher = async (req, res) => {
     }
 };
 
+
 exports.fetchAssignmentsOfStudent = async (req, res) => {
     const { useruid } = req.params;
     try {
@@ -167,3 +168,48 @@ exports.joinAssignment = async (req,res) =>{
         res.status(400).send(error);
     }
 }
+
+
+exports.fetchParticularAssignmentofTeacher = async (req,res)=>{
+    const id = req.params.id;  
+    const { uid } = req.query;
+    try {
+        const assignment = await Assignment.findOne({ code: id, createdBy: uid });
+        if (!assignment) {
+            return res.status(404).json({ error: 'Assignment not found' });
+        }
+        res.status(200).json(assignment);
+    } catch (error) {
+        res.status(400).send(error);
+    }
+}
+
+
+exports.fetchParticularAssignmentofStudent = async (req, res) => {
+    const  id = req.params.id;
+    const { uid } = req.query;
+
+    try {
+        const assignment = await Assignment.findOne({ code: id });
+
+        if (!assignment) {
+            return res.status(404).json({ error: 'Assignment not found for this student' });
+        }
+
+        if (!assignment.students.includes(uid)) {
+            return res.status(404).json({ error: 'Student not associated with this assignment' });
+        }
+        const response = {
+            title: assignment.title,
+            desc: assignment.desc,
+            isEvaluated: assignment.isEvaluated,
+            deadline: assignment.deadline,
+            createdBy: assignment.createdBy
+        };
+
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(400).json({ error: 'Failed to fetch assignment', details: error.message });
+    }
+};
+ 
