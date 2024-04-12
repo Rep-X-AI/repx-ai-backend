@@ -82,7 +82,7 @@ exports.fetchAssignmentsOfStudent = async (req, res) => {
             { $lookup: { from: 'users', localField: 'createdBy', foreignField: 'useruid', as: 'teacher' } },
             { $unwind: '$teacher' },
             {
-                $project: { title: 1, desc: 1, code: 1, isPublished: 1, questionUrl: 1, teacher: '$teacher.name',
+                $project: { title: 1, desc: 1,deadline:1, code: 1, isPublished: 1, questionUrl: 1, teacher: '$teacher.name', 
                     submissions: {
                         $map: {
                             input: {
