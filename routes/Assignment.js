@@ -11,12 +11,16 @@ const {
   joinAssignment,
   fetchParticularAssignmentofStudent,
   fetchParticularAssignmentofTeacher,
+  getSubmissionsOfTeachers,
+  getSubmissionOfStudent,
+  submitAssignment
 } = require("../controller/Assignment");
 
 
 router
   .post("/create", createAssignment)
   .post("/joinAssignment",joinAssignment)
+  .post("/submitAssignment/:id", submitAssignment)
   .get("/teachers/:useruid", fetchAssignmentsOfTeacher)
   .get("/students/:useruid", fetchAssignmentsOfStudent)
   .patch("/:id", updateAssignment)
@@ -24,5 +28,8 @@ router
   .delete("/:id/submissions", deleteAllSubmissions)
   .get("/get-assignment-teacher/:id",fetchParticularAssignmentofTeacher)
   .get("/get-assignment-student/:id",fetchParticularAssignmentofStudent)
+  .get("/get-submissions-teacher/:id" , getSubmissionsOfTeachers )
+  .get("/get-submissions-student/:id" , getSubmissionOfStudent )
+
 
 module.exports = {router}
