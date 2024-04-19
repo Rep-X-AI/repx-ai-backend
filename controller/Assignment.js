@@ -185,6 +185,7 @@ exports.fetchParticularAssignmentofTeacher = async (req,res)=>{
             deadline: assignment.deadline,
             createdBy: assignment.createdBy,
             teacher: assignment.teacherName,
+            tmark: assignment.tmarks,
             submissionCount:assignment.submissions.length,
             pendingCount :assignment.students.length - assignment.submissions.length,
             questionUrl:assignment.questionUrl
@@ -217,6 +218,7 @@ exports.fetchParticularAssignmentofStudent = async (req, res) => {
             isEvaluated: assignment.isEvaluated,
             deadline: assignment.deadline,
             teacher: assignment.teacherName,
+            tmark: assignment.tmarks,
             createdBy: assignment.createdBy,
             hasSubmitted: hasSubmitted,
             questionUrl:assignment.questionUrl
