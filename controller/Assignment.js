@@ -274,7 +274,7 @@ exports.getSubmissionOfStudent = async (req, res) => {
 
 exports.submitAssignment = async (req, res) => {
     const id = req.params.id;
-    const { uid, answerUrl } = req.body; 
+    const { uid, answerUrl ,studentname} = req.body; 
 
     try {
         const assignment = await Assignment.findOne({ code: id });
@@ -291,7 +291,8 @@ exports.submitAssignment = async (req, res) => {
         const newSubmission = {
             student: uid,
             answerUrl: answerUrl,
-            marks: null 
+            marks: null ,
+            studentname:studentname
         };
         assignment.submissions.push(newSubmission);
         await assignment.save();
