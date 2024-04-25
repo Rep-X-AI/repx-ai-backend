@@ -16,6 +16,7 @@ const assignmentSchema = new Schema ({
     students:  [{type: String, ref: 'User'}],    // stores all the useruids of the assigned students
     submissions: [{
         student: {type: String, ref: 'User', required: true},   // student will store the useruid of the student an not mongodb id
+        studentname:{type: String,required:true},
         answerUrl: {type: String, required: true},
         marks: {type: Number, default: null}
     }]
