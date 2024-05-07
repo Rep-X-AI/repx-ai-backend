@@ -189,7 +189,8 @@ exports.fetchParticularAssignmentofTeacher = async (req,res)=>{
             submissionCount:assignment.submissions.length,
             pendingCount :assignment.students.length - assignment.submissions.length,
             questionUrl:assignment.questionUrl,
-            modelAnsUrl:assignment.modelAnsUrl
+            modelAnsUrl:assignment.modelAnsUrl,
+            diagramurl:assignment.diagramurl,
         };
         res.status(200).json(response);
     } catch (error) {
