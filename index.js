@@ -29,7 +29,7 @@ server.use((req, res, next) => {
 });
 
 
-server.post(`${corsOrigin}/deleteAssignment`, async (req, res) => {
+server.post(`/deleteAssignment`, async (req, res) => {
   try {
     const requestData = req.body; 
     const response = await axios.post('http://35.193.123.233/deleteAssignment', requestData);
@@ -43,8 +43,8 @@ server.post(`${corsOrigin}/deleteAssignment`, async (req, res) => {
   }
 });
 
-
-server.post(`${corsOrigin}/createAssignment`, async (req, res) => {
+//${corsOrigin}
+server.post(`/createAssignment`, async (req, res) => {
   try {
     const requestData = req.body; 
     const response = await axios.post('http://35.193.123.233/createAssignment', requestData);
