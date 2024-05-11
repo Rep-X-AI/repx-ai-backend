@@ -43,7 +43,6 @@ server.post(`/deleteAssignment`, async (req, res) => {
   }
 });
 
-//${corsOrigin}
 server.post(`/createAssignment`, async (req, res) => {
   try {
     const requestData = req.body; 
@@ -59,19 +58,19 @@ server.post(`/createAssignment`, async (req, res) => {
 });
 
 
-// server.post('/evaluateAssignment', async (req, res) => {
-//   try {
-//     const requestData = req.body; 
-//     const response = await axios.post('http://35.193.123.233/evaluateAssignment', requestData);
-//     res.json(response.data);
-//   } catch (error) {
-//     if (error.response) {
-//       res.status(error.response.status).send(error.response.statusText);
-//     } else {
-//       res.status(500).send('Internal Server Error');
-//     }
-//   }
-// });
+server.post('/evaluateAssignment', async (req, res) => {
+  try {
+    const requestData = req.body; 
+    const response = await axios.post('http://35.193.123.233/evaluateAssignment', requestData);
+    res.json(response.data);
+  } catch (error) {
+    if (error.response) {
+      res.status(error.response.status).send(error.response.statusText);
+    } else {
+      res.status(500).send('Internal Server Error');
+    }
+  }
+});
 
 
 // Connect to database
