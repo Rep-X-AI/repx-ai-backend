@@ -13,7 +13,8 @@ const {
   fetchParticularAssignmentofTeacher,
   getSubmissionsOfTeachers,
   getSubmissionOfStudent,
-  submitAssignment
+  submitAssignment,
+  evaluate
 } = require("../controller/Assignment");
 
 
@@ -30,6 +31,6 @@ router
   .get("/get-assignment-student/:id",fetchParticularAssignmentofStudent)
   .get("/get-submissions-teacher/:id" , getSubmissionsOfTeachers )
   .get("/get-submissions-student/:id" , getSubmissionOfStudent )
-
+  .post("/evaluate/:id" , evaluate)
 
 module.exports = {router}

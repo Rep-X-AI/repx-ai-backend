@@ -78,11 +78,18 @@ exports.fetchAssignmentsOfStudent = async (req, res) => {
     const { useruid } = req.params;
     try {
         const assignments = await Assignment.aggregate([
-            { $match: { students: useruid } },
+            { $match: { 'students.student': useruid } }, // Adjusted $match stage
             { $lookup: { from: 'users', localField: 'createdBy', foreignField: 'useruid', as: 'teacher' } },
             { $unwind: '$teacher' },
             {
-                $project: { title: 1, desc: 1,deadline:1,  code: 1, isPublished: 1, questionUrl: 1, teacher: '$teacher.name',
+                $project: {
+                    title: 1,
+                    desc: 1,
+                    deadline: 1,
+                    code: 1,
+                    isPublished: 1,
+                    questionUrl: 1,
+                    teacher: '$teacher.name',
                     submissions: {
                         $map: {
                             input: {
@@ -113,6 +120,7 @@ exports.fetchAssignmentsOfStudent = async (req, res) => {
         res.status(400).json(err);
     }
 };
+
 
 exports.deleteAssignment = async (req, res) => {
     const code = req.params.id;
@@ -152,17 +160,18 @@ exports.deleteAllSubmissions = async (req, res) => {
 };
 
 exports.joinAssignment = async (req,res) =>{
-    const { code, uid } = req.body;
+    const { code, uid , name } = req.body;
     try {
         const assignment = await Assignment.findOne({ code });
         if (!assignment) {
             return res.status(404).json({ error: 'Assignment not found' });
         }
-        if (assignment.students.includes(uid)) {
+        if (assignment.students.some(student => student.student === uid)) {
             return res.status(409).json({ error: 'Student is already part of this assignment' });
-        }
-        assignment.students.push(uid);
+        }        
+        assignment.students.push({ student: uid, studentname: name });
         await assignment.save();
+
         res.status(200).json({ message: 'Student added to assignment successfully' });
     } catch (error) {
         res.status(400).send(error);
@@ -198,9 +207,8 @@ exports.fetchParticularAssignmentofTeacher = async (req,res)=>{
     }
 }
 
-
 exports.fetchParticularAssignmentofStudent = async (req, res) => {
-    const  id = req.params.id;
+    const id = req.params.id;
     const { uid } = req.query;
 
     try {
@@ -210,10 +218,13 @@ exports.fetchParticularAssignmentofStudent = async (req, res) => {
             return res.status(404).json({ error: 'Assignment not found for this student' });
         }
 
-        if (!assignment.students.includes(uid)) {
+        const isStudentAssociated = assignment.students.some(student => student.student === uid);
+        if (!isStudentAssociated) {
             return res.status(404).json({ error: 'Student not associated with this assignment' });
         }
+
         const hasSubmitted = assignment.submissions.some(submission => submission.student === uid);
+
         const response = {
             title: assignment.title,
             desc: assignment.desc,
@@ -223,7 +234,7 @@ exports.fetchParticularAssignmentofStudent = async (req, res) => {
             tmark: assignment.tmarks,
             createdBy: assignment.createdBy,
             hasSubmitted: hasSubmitted,
-            questionUrl:assignment.questionUrl
+            questionUrl: assignment.questionUrl
         };
 
         res.status(200).json(response);
@@ -231,6 +242,7 @@ exports.fetchParticularAssignmentofStudent = async (req, res) => {
         res.status(400).json({ error: 'Failed to fetch assignment', details: error.message });
     }
 };
+
  
 exports.getSubmissionsOfTeachers = async (req, res) => {
     const id = req.params.id;
@@ -241,12 +253,24 @@ exports.getSubmissionsOfTeachers = async (req, res) => {
             return res.status(404).json({ error: 'Assignment not found' });
         }
         const submissions = assignment.submissions; 
-        res.status(200).json(submissions);
+        
+        const notSubmittedStudents = assignment.students
+            .filter(student => !submissions.some(submission => submission.student === student.student))
+            .map(notSubmittedStudent => notSubmittedStudent.studentname);
+
+        const responseData = {
+            submissions: submissions,
+            notSubmittedStudents: notSubmittedStudents
+        };
+
+        res.status(200).json(responseData);
     } catch (error) {
         console.error(error); 
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+
 
 exports.getSubmissionOfStudent = async (req, res) => {
     const id = req.params.id;
@@ -273,34 +297,66 @@ exports.getSubmissionOfStudent = async (req, res) => {
 };
 
 
-
 exports.submitAssignment = async (req, res) => {
     const id = req.params.id;
-    const { uid, answerUrl ,studentname} = req.body; 
+    const { uid, answerUrl, studentname } = req.body;
 
     try {
         const assignment = await Assignment.findOne({ code: id });
         if (!assignment) {
             return res.status(404).json({ error: 'Assignment not found' });
         }
-        if (!assignment.students.includes(uid)) {
+        
+        const isAuthorized = assignment.students.some(student => student.student === uid);
+        if (!isAuthorized) {
             return res.status(403).json({ error: 'You are not authorized to submit this assignment' });
         }
+
         const existingSubmission = assignment.submissions.find(submission => submission.student === uid);
         if (existingSubmission) {
             return res.status(400).json({ error: 'You have already submitted this assignment' });
         }
+        
         const newSubmission = {
             student: uid,
             answerUrl: answerUrl,
-            marks: null ,
-            studentname:studentname
+            marks: null,
+            studentname: studentname
         };
+        
         assignment.submissions.push(newSubmission);
         await assignment.save();
+        
         res.status(200).json({ message: 'Assignment submitted successfully' });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 };
+
+
+exports.evaluate = async (req,res) =>{
+    const id = req.params.id;
+    const {studentId , marks} = req.body ;
+    try {
+
+        const assignment = await Assignment.findOne({ code: id });
+        if (!assignment) {
+            return res.status(404).json({ error: 'Assignment not found' });
+        }
+
+        const submissionRecord = assignment.submissions.find(submission => submission.student === studentId);
+        if (!submissionRecord) {
+            return res.status(404).json({ error: 'Submission record not found for the user' });
+        }
+
+        submissionRecord.marks = marks; 
+        await assignment.save();
+        
+        res.status(200).json({ message: 'Marks updated successfully' });
+  
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+}

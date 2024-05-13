@@ -14,7 +14,10 @@ const assignmentSchema = new Schema ({
     createdBy: {type: String, ref: 'User', required: true},     // stores useruid of the teacher who created
     teacherName: {type: String, required: true},  // stores teacher's name i guess and it's working
     tmarks : {type: Number, required: true, default: null},
-    students:  [{type: String, ref: 'User'}],    // stores all the useruids of the assigned students
+    students:  [{
+        student:{type: String, ref: 'User'},
+        studentname:{type: String,required:true},
+    }],    // stores all the useruids of the assigned students
     submissions: [{
         student: {type: String, ref: 'User', required: true},   // student will store the useruid of the student an not mongodb id
         studentname:{type: String,required:true},
