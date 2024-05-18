@@ -32,7 +32,7 @@ server.use((req, res, next) => {
 server.post(`/deleteAssignment`, async (req, res) => {
   try {
     const requestData = req.body; 
-    const response = await axios.post('http://35.193.123.233/deleteAssignment', requestData);
+    const response = await axios.post('http://34.30.189.207/deleteAssignment', requestData);
     res.json(response.data);
   } catch (error) {
     if (error.response) {
@@ -46,7 +46,7 @@ server.post(`/deleteAssignment`, async (req, res) => {
 server.post(`/createAssignment`, async (req, res) => {
   try {
     const requestData = req.body; 
-    const response = await axios.post('http://35.193.123.233/createAssignment', requestData);
+    const response = await axios.post('http://34.30.189.207/createAssignment', requestData);
     res.json(response.data);
   } catch (error) {
     if (error.response) {
@@ -61,7 +61,7 @@ server.post(`/createAssignment`, async (req, res) => {
 server.post('/evaluateAssignment', async (req, res) => {
   try {
     const requestData = req.body; 
-    const response = await axios.post('http://35.193.123.233/evaluateAssignment', requestData);
+    const response = await axios.post('http://34.30.189.207/evaluateAssignment', requestData);
     res.json(response.data);
   } catch (error) {
     if (error.response) {
