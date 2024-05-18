@@ -11,7 +11,7 @@ const assignmentsRouter = require('./routes/Assignment');
 
 const corsOrigin =
   process.env.REACT_APP_NODE_ENV === "production"
-    ? "https://repxai-dummy.vercel.app"
+    ? "https://repxai.vercel.app"
     : "http://localhost:3000";
 
 server.use(
