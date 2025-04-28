@@ -96,13 +96,9 @@ Contributions are welcome! Please check out our [Contributing Guidelines](CONTRI
 
 - [Subhadeep Roy](git.new/Subha)
 - [Satyaki Dey](https://github.com/SatyakiDey75)
-- [Priyanshu Dutta
-](github.com/priyanshudutta04)
-- [Rishi Bhattasali
-](github.com/Rishi2403)
-- [Arunava Dutta
-](github.com/ArunavaCoderEm)
-- [Pretisha Sahoo
-](https://github.com/PretishaSahoo)
+- [Priyanshu Dutta](https://github.com/priyanshudutta04)
+- [Rishi Bhattasali](https://github.com/Rishi2403)
+- [Arunava Dutta](https://github.com/ArunavaCoderEm)
+- [Pretisha Sahoo](https://github.com/PretishaSahoo)
 
 ---
