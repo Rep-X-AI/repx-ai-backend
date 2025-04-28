@@ -1,6 +1,6 @@
 # RepX AI Backend
 
-[![License: ISC](https://img.shields.io/badge/License-ISC-blue.svg)](https://opensource.org/licenses/ISC)
+[![License: ISC](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 
 The backend server for RepX AI, an educational platform that facilitates assignment creation, submission, and evaluation between teachers and students.
 
